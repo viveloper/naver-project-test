@@ -23,7 +23,7 @@ class App {
   }
 
   handlePopState(e) {
-    const { path } = e.state;
+    const path = e.state?.path;
     this.route(path);
   }
 
