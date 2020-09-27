@@ -1,0 +1,89 @@
+html,
+body {
+  padding: 0;
+  margin: 0;
+}
+
+.app {
+  width: 100%;
+}
+
+.app .container {
+  margin: 0 auto;
+  width: 75rem;
+}
+
+.app header h1 {
+  padding: 1rem;
+  color: #fff;
+  font-size: 4rem;
+  text-align: center;
+  background-color: #03c75a;
+}
+
+.recommended-movies {
+  height: 320px;
+}
+
+.recommended-movies ul {
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: row;
+}
+
+.recommended-movies li {
+  flex: 1;
+  list-style: none;
+  margin: 0 8px;
+  cursor: pointer;
+  height: 270px;
+}
+
+.recommended-movies .img-wrapper {
+  background-color: #999;
+  position: relative;
+  height: 270px;
+}
+
+.recommended-movies img {
+  width: 100%;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: ;
+  object-fit: cover;
+}
+
+.movie-detail {
+  display: flex;
+  flex-direction: row;
+}
+
+.movie-detail div {
+  flex: 1;
+  margin-right: 40px;
+}
+
+.movie-detail img {
+  width: 50%;
+}
+
+dl {
+  width: 100%;
+  overflow: hidden;
+  padding: 0;
+  margin: 0;
+}
+dt {
+  float: left;
+  width: 120px;
+  padding: 0;
+  margin: 0;
+}
+dd {
+  float: left;
+  width: calc(100% - 200px);
+  padding: 0;
+  margin: 0;
+}
