@@ -1,4 +1,5 @@
 import Component from '../components/Component.js';
+import Header from '../components/Header.js';
 import RecommendedMoves from '../components/RecommendedMovies.js';
 import * as api from '../api/index.js';
 
@@ -13,7 +14,9 @@ class HomePage extends Component {
     this.onMovieClick = onMovieClick;
 
     this.state = {
-      data: [],
+      loading: false,
+      data: null,
+      error: null,
     };
 
     this.fetchRecommendedMovies();
@@ -32,34 +35,58 @@ class HomePage extends Component {
   }
 
   async fetchRecommendedMovies() {
+    this.setState({
+      loading: true,
+      data: null,
+      error: null,
+    });
     const { isError, data } = await api.fetchRecommendedMovies();
     if (!isError) {
       this.setState({
+        loading: false,
         data,
+        error: null,
       });
     } else {
       console.error(data);
+      this.setState({
+        loading: false,
+        data: null,
+        error: data,
+      });
     }
   }
 
   render() {
-    const { data } = this.state;
-    this.el.innerHTML = `
-      <header>
-        <h1>🎬오늘의 추천 영화</h1>
-      </header>
-      <div class="container"></div>
-    `;
+    this.el.innerHTML = '';
 
-    const container = this.el.querySelector('.container');
+    const { loading, data, error } = this.state;
+
+    new Header({ $target: this.el });
+    const container = document.createElement('div');
+    container.className = 'container';
+
+    if (loading) {
+      container.innerHTML = `<h2>Loading...</h2>`;
+      this.el.appendChild(container);
+      return;
+    }
+    if (error) {
+      container.innerHTML = `<div><h2>Error!</h2><p>${error.message}</p><div/>`;
+      this.el.appendChild(container);
+      return;
+    }
+    if (!data) return;
 
     data.map(
       (movieGuide) =>
         new RecommendedMoves({
           $target: container,
-          data: movieGuide,
+          movieGuide,
         })
     );
+
+    this.el.appendChild(container);
   }
 }
 

@@ -15,27 +15,33 @@ class MovieDetail extends Component {
     this.render();
   }
   render() {
-    const { movie } = this.state;
+    const {
+      movie: { image, title, subtitle, pubDate, director, actor, userRating },
+    } = this.state;
 
-    if (!movie) {
-      this.el.innerHTML = '';
-      return;
-    }
+    const _director = director
+      .split('|')
+      .filter((item) => !!item)
+      .join(', ');
+    const _actor = actor
+      .split('|')
+      .filter((item) => !!item)
+      .join(', ');
 
     this.el.innerHTML = `
-      <img src="${movie.image}" />
+      <img src="${image}" />
       <div>
-        <h2>${movie.title}</h2>
-        <h2>${movie.subtitle}</h2>
+        <h2>${title}</h2>
+        <h2>${subtitle}</h2>
         <dl>
           <dt>개봉년도</dt>
-          <dd>${movie.pubDate}</dd>
+          <dd>${pubDate}</dd>
           <dt>감독</dt>
-          <dd>${movie.director}</dd>
+          <dd>${_director ? _director : '-'}</dd>
           <dt>배우</dt>
-          <dd>${movie.actor}</dd>
+          <dd>${_actor ? _actor : '-'}</dd>
           <dt>평점</dt>
-          <dd>${movie.userRating}</dd>
+          <dd>${userRating}</dd>
         </dl>
       </div>
     `;

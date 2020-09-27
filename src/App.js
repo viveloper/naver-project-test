@@ -1,17 +1,25 @@
+import Component from './components/Component.js';
 import HomePage from './pages/HomePage.js';
 import MovieDetailPage from './pages/MovieDetailPage.js';
 
-class App {
-  constructor($target) {
-    this.$target = $target;
+class App extends Component {
+  constructor({ $target }) {
+    super({
+      $target,
+      tagName: 'main',
+      className: 'app',
+    });
+
+    this.state = {
+      path: location.pathname,
+    };
 
     this.handleMovieClick = this.handleMovieClick.bind(this);
     this.handlePopState = this.handlePopState.bind(this);
-    this.route = this.route.bind(this);
 
     window.addEventListener('popstate', this.handlePopState);
 
-    this.route();
+    this.render();
   }
 
   handleMovieClick(id) {
@@ -19,29 +27,32 @@ class App {
     if (path !== history.state?.path) {
       history.pushState({ path }, '', path);
     }
-    this.route();
+    this.setState({
+      path,
+    });
   }
 
   handlePopState(e) {
     const path = e.state?.path;
-    this.route(path);
+    this.setState({
+      path: path ? path : location.pathname,
+    });
   }
 
-  route(path) {
-    this.$target.innerHTML = '';
+  render() {
+    this.el.innerHTML = ``;
 
-    if (!path) path = location.pathname;
+    const { path } = this.state;
 
     if (path === '/') {
       new HomePage({
-        $target: this.$target,
+        $target: this.el,
         onMovieClick: this.handleMovieClick,
       });
     } else if (path.startsWith('/movie/')) {
-      const movieId = Number(location.pathname.replace('/movie/', ''));
       new MovieDetailPage({
-        $target: this.$target,
-        movieId,
+        $target: this.el,
+        movieId: path.replace('/movie/', ''),
       });
     }
   }

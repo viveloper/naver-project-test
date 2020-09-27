@@ -3,7 +3,7 @@ import * as api from '../api/index.js';
 import { imageLazyLoad } from '../util/lazyLoad.js';
 
 class RecommendedMovies extends Component {
-  constructor({ $target, data }) {
+  constructor({ $target, movieGuide }) {
     super({
       $target,
       tagName: 'section',
@@ -11,48 +11,92 @@ class RecommendedMovies extends Component {
     });
 
     this.state = {
-      data,
-      movies: [],
+      movieGuide,
+      movies: {
+        loading: false,
+        data: null,
+        error: null,
+      },
     };
 
-    this.fetchMovies(this.state.data.items.slice(0, 8));
+    this.fetchMovies(movieGuide.items.slice(0, 8));
 
     this.render();
   }
 
   async fetchMovies(ids) {
+    this.setState({
+      movies: {
+        loading: true,
+        data: null,
+        error: null,
+      },
+    });
     const { isError, data } = await api.fetchMovies(ids);
     if (!isError) {
       this.setState({
-        movies: data,
+        movies: {
+          loading: false,
+          data,
+          error: null,
+        },
       });
     } else {
       console.error(data);
+      this.setState({
+        movies: {
+          loading: false,
+          data: null,
+          error: data,
+        },
+      });
     }
   }
 
   render() {
-    const { data, movies } = this.state;
-    this.el.innerHTML = `
-      <h1>${data.title}</h1>
-      <ul>
-        ${movies
-          .map(
-            ({ id, image, title }) => `
-          <li>
-            <div class="img-wrapper">
-              <img class="movie-image lazy" data-id="${id}" data-src="${image}" />
-            </div>
-          </li>
-        `
-          )
-          .join('')}
-      </ul>
-    `;
+    this.el.innerHTML = '';
 
-    this.el.querySelectorAll('img.movie-image').forEach((imgEl) => {
-      imageLazyLoad(imgEl);
+    const {
+      movieGuide,
+      movies: { loading, data, error },
+    } = this.state;
+
+    const title = document.createElement('h1');
+    title.innerText = movieGuide.title;
+    this.el.appendChild(title);
+
+    const movieList = document.createElement('ul');
+
+    if (loading) {
+      movieList.innerHTML = `<h2>Loading...</h2>`;
+      this.el.appendChild(movieList);
+      return;
+    }
+    if (error) {
+      movieList.innerHTML = `<div><h2>Error!</h2><p>${error.message}</p><div/>`;
+      this.el.appendChild(movieList);
+      return;
+    }
+    if (!data) return;
+
+    data.forEach(({ id, image, title }) => {
+      const listItem = document.createElement('li');
+
+      const imgWrapper = document.createElement('div');
+      imgWrapper.className = 'img-wrapper';
+
+      const img = document.createElement('img');
+      img.className = 'movie-image lazy';
+      img.dataset.id = id;
+      img.dataset.src = image;
+      imageLazyLoad(img);
+
+      imgWrapper.appendChild(img);
+      listItem.appendChild(imgWrapper);
+      movieList.appendChild(listItem);
     });
+
+    this.el.appendChild(movieList);
   }
 }
 
